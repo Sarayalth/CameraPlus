@@ -536,7 +536,7 @@ namespace CameraPlus
 			else
 			{
 				GameplayCoreSceneSetupData data = BS_Utils.Plugin.LevelData?.GameplayCoreSceneSetupData;
-				if (!(data.difficultyBeatmap.beatmapData.spawnRotationEventsCount > 0))
+				if (data.difficultyBeatmap.beatmapData.spawnRotationEventsCount > 0)
 				{
 					return true;
 				}
