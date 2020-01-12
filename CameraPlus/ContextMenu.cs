@@ -58,9 +58,9 @@ namespace CameraPlus
                 Matrix4x4 originalMatrix = GUI.matrix;
                 GUI.matrix = Matrix4x4.TRS(new Vector3(0, 0, 0), Quaternion.identity, scale);
                 //Layer boxes for Opacity
-                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 400), "CameraPlus");
-                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 400), "CameraPlus");
-                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 400), "CameraPlus");
+                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus");
+                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus");
+                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus");
                 if (!layoutMode)
                 {
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 25, 120, 30), new GUIContent("Add New Camera")))
@@ -102,35 +102,14 @@ namespace CameraPlus
                     {
                         layoutMode = true;
                     }
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 105, 120, 30), 
-                        new GUIContent(parentBehaviour.Config.use360Camera? "First Person" : parentBehaviour.Config.thirdPerson ? " 360 Third Person" : "Third Person" )))
-                    {
-                        if(parentBehaviour.Config.use360Camera)
-                        {
-                            parentBehaviour.Config.thirdPerson = !parentBehaviour.Config.thirdPerson;
-                            parentBehaviour.ThirdPerson = parentBehaviour.Config.thirdPerson;
-                            parentBehaviour.ThirdPersonPos = parentBehaviour.Config.Position;
-                            parentBehaviour.ThirdPersonRot = parentBehaviour.Config.Rotation;
-                            parentBehaviour.Config.use360Camera = false;
-                        }
-                        else if(parentBehaviour.Config.thirdPerson)
-                        {
-                            parentBehaviour.Config.use360Camera = true;
-                        }
-                        else
-                        {
-                            parentBehaviour.Config.thirdPerson = !parentBehaviour.Config.thirdPerson;
-                            parentBehaviour.ThirdPerson = parentBehaviour.Config.thirdPerson;
-                            parentBehaviour.ThirdPersonPos = parentBehaviour.Config.Position;
-                            parentBehaviour.ThirdPersonRot = parentBehaviour.Config.Rotation;
-                        }
-                        //      FirstPersonOffset = Config.FirstPersonPositionOffset;
-                        //     FirstPersonRotationOffset = Config.FirstPersonRotationOffset;
-                        parentBehaviour.CreateScreenRenderTexture();
-                        parentBehaviour.CloseContextMenu();
-                        parentBehaviour.Config.Save();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 130, menuPos.y + 105, 170, 30), new GUIContent(parentBehaviour.Config.showThirdPersonCamera ? "Hide Third Person Camera" : "Show Third Person Camera")))
+					if (GUI.Button(new Rect(menuPos.x, menuPos.y + 105, 120, 30), new GUIContent(parentBehaviour.Config.showAvatar ? "Hide Avatar" : "Show Avatar")))
+					{
+						parentBehaviour.Config.showAvatar = !parentBehaviour.Config.showAvatar;
+						parentBehaviour.Config.Save();
+						parentBehaviour.CreateScreenRenderTexture();
+						parentBehaviour.CloseContextMenu();
+					}
+					if (GUI.Button(new Rect(menuPos.x + 130 , menuPos.y + 105, 170, 30), new GUIContent(parentBehaviour.Config.showThirdPersonCamera ? "Hide Third Person Camera" : "Show Third Person Camera")))
                     {
 
                         parentBehaviour.Config.showThirdPersonCamera = !parentBehaviour.Config.showThirdPersonCamera;
@@ -152,16 +131,114 @@ namespace CameraPlus
                         parentBehaviour.CloseContextMenu();
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 355, 300, 30), new GUIContent("Close Menu")))
+					if (GUI.Button(new Rect(menuPos.x, menuPos.y + 185, 300, 30), new GUIContent(parentBehaviour.Config.alternativeGameModeDetection ? "Deactivate Alternative GameMode Detection" : "Activate Alternative GameMode Detection")))
+					{
+						parentBehaviour.Config.alternativeGameModeDetection = !parentBehaviour.Config.alternativeGameModeDetection;
+						parentBehaviour.Config.Save();
+						parentBehaviour.CreateScreenRenderTexture();
+						parentBehaviour.CloseContextMenu();
+					}
+					GUI.Label(new Rect(menuPos.x + 115, menuPos.y + 225, 310, 400), "Main Menu:");
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 245, 300, 30), 
+                        new GUIContent(parentBehaviour.Config.mainMenuUse360Camera? "First Person" : parentBehaviour.Config.mainMenuThirdPerson ? " 360 Third Person" : "Third Person" )))
                     {
+                        if(parentBehaviour.Config.mainMenuUse360Camera)
+                        {
+                            parentBehaviour.Config.mainMenuThirdPerson = !parentBehaviour.Config.mainMenuThirdPerson;
+                            parentBehaviour.ThirdPerson = parentBehaviour.Config.mainMenuThirdPerson;
+                            parentBehaviour.ThirdPersonPos = parentBehaviour.Config.Position;
+                            parentBehaviour.ThirdPersonRot = parentBehaviour.Config.Rotation;
+                            parentBehaviour.Config.mainMenuUse360Camera = false;
+							parentBehaviour.Config.mainMenuCameraType = "FirstPerson";
+						}
+                        else if(parentBehaviour.Config.mainMenuThirdPerson)
+                        {
+                            parentBehaviour.Config.mainMenuUse360Camera = true;
+							parentBehaviour.Config.mainMenuCameraType = "360";
+						}
+                        else
+                        {
+                            parentBehaviour.Config.mainMenuThirdPerson = !parentBehaviour.Config.mainMenuThirdPerson;
+                            parentBehaviour.ThirdPerson = parentBehaviour.Config.mainMenuThirdPerson;
+                            parentBehaviour.ThirdPersonPos = parentBehaviour.Config.Position;
+                            parentBehaviour.ThirdPersonRot = parentBehaviour.Config.Rotation;
+							parentBehaviour.Config.mainMenuCameraType = "ThirdPerson";
+						}
+                        //      FirstPersonOffset = Config.FirstPersonPositionOffset;
+                        //     FirstPersonRotationOffset = Config.FirstPersonRotationOffset;
+                        parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.CloseContextMenu();
+                        parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 185, 300, 30), new GUIContent("Spawn 38 Cameras")))
-                    {
-                        parentBehaviour.StartCoroutine(CameraUtilities.Spawn38Cameras());
-                        parentBehaviour.CloseContextMenu();
-                    }
-                }
+					GUI.Label(new Rect(menuPos.x + 100, menuPos.y + 285, 310, 400), "InGame Normal:");
+					if (GUI.Button(new Rect(menuPos.x, menuPos.y + 305, 300, 30),
+						new GUIContent(parentBehaviour.Config.gameCoreNormalUse360Camera ? "First Person" : parentBehaviour.Config.gameCoreNormalThirdPerson ? " 360 Third Person" : "Third Person")))
+					{
+						if (parentBehaviour.Config.gameCoreNormalUse360Camera)
+						{
+							parentBehaviour.Config.gameCoreNormalThirdPerson = !parentBehaviour.Config.gameCoreNormalThirdPerson;
+							parentBehaviour.ThirdPerson = parentBehaviour.Config.gameCoreNormalThirdPerson;
+							parentBehaviour.ThirdPersonPos = parentBehaviour.Config.Position;
+							parentBehaviour.ThirdPersonRot = parentBehaviour.Config.Rotation;
+							parentBehaviour.Config.gameCoreNormalUse360Camera = false;
+							parentBehaviour.Config.gameCoreNormalCameraType = "FirstPerson";
+						}
+						else if (parentBehaviour.Config.gameCoreNormalThirdPerson)
+						{
+							parentBehaviour.Config.gameCoreNormalUse360Camera = true;
+							parentBehaviour.Config.gameCoreNormalCameraType = "360";
+						}
+						else
+						{
+							parentBehaviour.Config.gameCoreNormalThirdPerson = !parentBehaviour.Config.gameCoreNormalThirdPerson;
+							parentBehaviour.ThirdPerson = parentBehaviour.Config.gameCoreNormalThirdPerson;
+							parentBehaviour.ThirdPersonPos = parentBehaviour.Config.Position;
+							parentBehaviour.ThirdPersonRot = parentBehaviour.Config.Rotation;
+							parentBehaviour.Config.gameCoreNormalCameraType = "ThirdPerson";
+						}
+						//      FirstPersonOffset = Config.FirstPersonPositionOffset;
+						//     FirstPersonRotationOffset = Config.FirstPersonRotationOffset;
+						parentBehaviour.CreateScreenRenderTexture();
+						parentBehaviour.CloseContextMenu();
+						parentBehaviour.Config.Save();
+					}
+					GUI.Label(new Rect(menuPos.x + 95, menuPos.y + 345, 310, 400), "InGame 360º/90º:");
+					if (GUI.Button(new Rect(menuPos.x, menuPos.y + 365, 300, 30),
+						new GUIContent(parentBehaviour.Config.gameCore360Use360Camera ? "First Person" : parentBehaviour.Config.gameCore360ThirdPerson ? " 360 Third Person" : "Third Person")))
+					{
+						if (parentBehaviour.Config.gameCore360Use360Camera)
+						{
+							parentBehaviour.Config.gameCore360ThirdPerson = !parentBehaviour.Config.gameCore360ThirdPerson;
+							parentBehaviour.ThirdPerson = parentBehaviour.Config.gameCore360ThirdPerson;
+							parentBehaviour.ThirdPersonPos = parentBehaviour.Config.Position;
+							parentBehaviour.ThirdPersonRot = parentBehaviour.Config.Rotation;
+							parentBehaviour.Config.gameCore360Use360Camera = false;
+							parentBehaviour.Config.gameCore360CameraType = "FirstPerson";
+						}
+						else if (parentBehaviour.Config.gameCore360ThirdPerson)
+						{
+							parentBehaviour.Config.gameCore360Use360Camera = true;
+							parentBehaviour.Config.gameCore360CameraType = "360";
+						}
+						else
+						{
+							parentBehaviour.Config.gameCore360ThirdPerson = !parentBehaviour.Config.gameCore360ThirdPerson;
+							parentBehaviour.ThirdPerson = parentBehaviour.Config.gameCore360ThirdPerson;
+							parentBehaviour.ThirdPersonPos = parentBehaviour.Config.Position;
+							parentBehaviour.ThirdPersonRot = parentBehaviour.Config.Rotation;
+							parentBehaviour.Config.gameCore360CameraType = "ThirdPerson";
+						}
+						//      FirstPersonOffset = Config.FirstPersonPositionOffset;
+						//     FirstPersonRotationOffset = Config.FirstPersonRotationOffset;
+						parentBehaviour.CreateScreenRenderTexture();
+						parentBehaviour.CloseContextMenu();
+						parentBehaviour.Config.Save();
+					}
+					if (GUI.Button(new Rect(menuPos.x, menuPos.y + 435, 300, 30), new GUIContent("Close Menu")))
+					{
+						parentBehaviour.CloseContextMenu();
+					}
+				}
                 else
                 {
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 25, 290, 30), new GUIContent("Reset Camera Position and Rotation")))

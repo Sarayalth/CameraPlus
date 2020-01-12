@@ -37,7 +37,18 @@ namespace CameraPlus
                 _cameraCube.gameObject.SetActive(_thirdPerson && Config.showThirdPersonCamera);
                 _cameraPreviewQuad.gameObject.SetActive(_thirdPerson && Config.showThirdPersonCamera);
 
-                if (value)
+				if (Config.showAvatar)
+				{
+					_cam.cullingMask &= ~(1 << OnlyInFirstPerson);
+					_cam.cullingMask |= 1 << OnlyInThirdPerson;
+				}
+				else
+				{
+					_cam.cullingMask &= ~(1 << OnlyInThirdPerson);
+					_cam.cullingMask |= 1 << OnlyInFirstPerson;
+				}
+
+                /*if (value)
                 {
                     _cam.cullingMask &= ~(1 << OnlyInFirstPerson);
                     _cam.cullingMask |= 1 << OnlyInThirdPerson;
@@ -46,7 +57,7 @@ namespace CameraPlus
                 {
                     _cam.cullingMask &= ~(1 << OnlyInThirdPerson);
                     _cam.cullingMask |= 1 << OnlyInFirstPerson;
-                }
+                }*/
             }
         }
 
@@ -237,7 +248,7 @@ namespace CameraPlus
 
         protected virtual void ReadConfig()
         {
-            ThirdPerson = Config.thirdPerson;
+			ThirdPerson = Config.mainMenuThirdPerson;
 
             if (!ThirdPerson)
             {
@@ -353,7 +364,7 @@ namespace CameraPlus
             {
                 if (Input.GetKeyDown(KeyCode.F1))
                 {
-                    ThirdPerson = !ThirdPerson;
+					ThirdPerson = !ThirdPerson;
                     if (!ThirdPerson)
                     {
                         transform.position = _mainCamera.transform.position;
@@ -367,7 +378,7 @@ namespace CameraPlus
                         ThirdPersonRot = Config.Rotation;
                     }
 
-                    Config.thirdPerson = ThirdPerson;
+                    Config.mainMenuThirdPerson = ThirdPerson;
                     Config.Save();
                 }
             }
@@ -380,39 +391,166 @@ namespace CameraPlus
             {
                 var camera = _mainCamera.transform;
 
-                if (ThirdPerson)
-                {
+				Scene scene = SceneManager.GetActiveScene();
+				if (scene.name == "MenuViewControllers")
+				{
+					if (Config.mainMenuCameraType == "FirstPerson")
+					{
+						//     Console.WriteLine(Config.FirstPersonPositionOffset.ToString());
+						transform.position = Vector3.Lerp(transform.position, camera.position + Config.FirstPersonPositionOffset,
+							Config.positionSmooth * Time.unscaledDeltaTime);
 
-                    HandleThirdPerson360();
-                    transform.position = ThirdPersonPos;
-                    transform.eulerAngles = ThirdPersonRot;
-                    _cameraCube.position = ThirdPersonPos;
-                    _cameraCube.eulerAngles = ThirdPersonRot;
-                    return;
-                }
-                //     Console.WriteLine(Config.FirstPersonPositionOffset.ToString());
-                transform.position = Vector3.Lerp(transform.position, camera.position + Config.FirstPersonPositionOffset,
-                    Config.positionSmooth * Time.unscaledDeltaTime);
+						if (!Config.forceFirstPersonUpRight)
+							transform.rotation = Quaternion.Slerp(transform.rotation, camera.rotation * Quaternion.Euler(Config.FirstPersonRotationOffset),
+								Config.rotationSmooth * Time.unscaledDeltaTime);
+						else
 
-                if (!Config.forceFirstPersonUpRight)
-                    transform.rotation = Quaternion.Slerp(transform.rotation, camera.rotation * Quaternion.Euler(Config.FirstPersonRotationOffset),
-                        Config.rotationSmooth * Time.unscaledDeltaTime);
-                else
+						{
+							Quaternion rot = Quaternion.Slerp(transform.rotation, camera.rotation * Quaternion.Euler(Config.FirstPersonRotationOffset),
+								Config.rotationSmooth * Time.unscaledDeltaTime);
+							transform.rotation = rot * Quaternion.Euler(0, 0, -(rot.eulerAngles.z));
+						}
+					}
+					else if (Config.mainMenuCameraType == "ThirdPerson")
+					{
+						ThirdPerson = Config.mainMenuThirdPerson;
+						ThirdPersonPos = Config.Position;
+						ThirdPersonRot = Config.Rotation;
+						transform.position = ThirdPersonPos;
+						transform.eulerAngles = ThirdPersonRot;
+						_cameraCube.position = ThirdPersonPos;
+						_cameraCube.eulerAngles = ThirdPersonRot;
+						return;
+					}
+					else if (Config.mainMenuCameraType == "360")
+					{
+						HandleThirdPerson360();
+						transform.position = ThirdPersonPos;
+						transform.eulerAngles = ThirdPersonRot;
+						_cameraCube.position = ThirdPersonPos;
+						_cameraCube.eulerAngles = ThirdPersonRot;
+						return;
+					}
+				}
+				else if (scene.name == "GameCore")
+				{
+					if (!Is360())
+					{
+						if (Config.gameCoreNormalCameraType == "FirstPerson")
+						{
+							//     Console.WriteLine(Config.FirstPersonPositionOffset.ToString());
+							transform.position = Vector3.Lerp(transform.position, camera.position + Config.FirstPersonPositionOffset,
+								Config.positionSmooth * Time.unscaledDeltaTime);
 
-                {
-                    Quaternion rot = Quaternion.Slerp(transform.rotation, camera.rotation * Quaternion.Euler(Config.FirstPersonRotationOffset),
-                        Config.rotationSmooth * Time.unscaledDeltaTime);
-                    transform.rotation = rot * Quaternion.Euler(0, 0, -(rot.eulerAngles.z));
-                }
+							if (!Config.forceFirstPersonUpRight)
+								transform.rotation = Quaternion.Slerp(transform.rotation, camera.rotation * Quaternion.Euler(Config.FirstPersonRotationOffset),
+									Config.rotationSmooth * Time.unscaledDeltaTime);
+							else
 
-            }
+							{
+								Quaternion rot = Quaternion.Slerp(transform.rotation, camera.rotation * Quaternion.Euler(Config.FirstPersonRotationOffset),
+									Config.rotationSmooth * Time.unscaledDeltaTime);
+								transform.rotation = rot * Quaternion.Euler(0, 0, -(rot.eulerAngles.z));
+							}
+						}
+						else if (Config.gameCoreNormalCameraType == "ThirdPerson")
+						{
+							ThirdPerson = Config.mainMenuThirdPerson;
+							ThirdPersonPos = Config.Position;
+							ThirdPersonRot = Config.Rotation;
+							transform.position = ThirdPersonPos;
+							transform.eulerAngles = ThirdPersonRot;
+							_cameraCube.position = ThirdPersonPos;
+							_cameraCube.eulerAngles = ThirdPersonRot;
+							return;
+						}
+						else if (Config.gameCoreNormalCameraType == "360")
+						{
+							HandleThirdPerson360();
+							transform.position = ThirdPersonPos;
+							transform.eulerAngles = ThirdPersonRot;
+							_cameraCube.position = ThirdPersonPos;
+							_cameraCube.eulerAngles = ThirdPersonRot;
+							return;
+						}
+					}
+					else
+					{
+						if (Config.gameCore360CameraType == "FirstPerson")
+						{
+							//     Console.WriteLine(Config.FirstPersonPositionOffset.ToString());
+							transform.position = Vector3.Lerp(transform.position, camera.position + Config.FirstPersonPositionOffset,
+								Config.positionSmooth * Time.unscaledDeltaTime);
+
+							if (!Config.forceFirstPersonUpRight)
+								transform.rotation = Quaternion.Slerp(transform.rotation, camera.rotation * Quaternion.Euler(Config.FirstPersonRotationOffset),
+									Config.rotationSmooth * Time.unscaledDeltaTime);
+							else
+
+							{
+								Quaternion rot = Quaternion.Slerp(transform.rotation, camera.rotation * Quaternion.Euler(Config.FirstPersonRotationOffset),
+									Config.rotationSmooth * Time.unscaledDeltaTime);
+								transform.rotation = rot * Quaternion.Euler(0, 0, -(rot.eulerAngles.z));
+							}
+						}
+						else if (Config.gameCore360CameraType == "ThirdPerson")
+						{
+							ThirdPerson = Config.mainMenuThirdPerson;
+							ThirdPersonPos = Config.Position;
+							ThirdPersonRot = Config.Rotation;
+							transform.position = ThirdPersonPos;
+							transform.eulerAngles = ThirdPersonRot;
+							_cameraCube.position = ThirdPersonPos;
+							_cameraCube.eulerAngles = ThirdPersonRot;
+							return;
+						}
+						else if (Config.gameCore360CameraType == "360")
+						{
+							HandleThirdPerson360();
+							transform.position = ThirdPersonPos;
+							transform.eulerAngles = ThirdPersonRot;
+							_cameraCube.position = ThirdPersonPos;
+							_cameraCube.eulerAngles = ThirdPersonRot;
+							return;
+						}
+					}
+				}
+			}
             catch { }
         }
+
+		private bool Is360()
+		{
+			if (Config.alternativeGameModeDetection)
+			{
+				GameplayCoreSceneSetupData data = BS_Utils.Plugin.LevelData?.GameplayCoreSceneSetupData;
+				if (data.difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName == "360Degree" || data.difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.serializedName == "90Degree")
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				GameplayCoreSceneSetupData data = BS_Utils.Plugin.LevelData?.GameplayCoreSceneSetupData;
+				if (!(data.difficultyBeatmap.beatmapData.spawnRotationEventsCount > 0))
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
 
         private void HandleThirdPerson360()
         {
 
-            if (!_beatLineManager || !Config.use360Camera || !_environmentSpawnRotation) return;
+            if (!_beatLineManager || !_environmentSpawnRotation) return;
 
             float b;
             if (_beatLineManager.isMidRotationValid)
@@ -458,8 +596,8 @@ namespace CameraPlus
                 {
                     ThirdPersonPos = Config.Position;
                     ThirdPersonRot = Config.Rotation;
-                    Config.thirdPerson = true;
-                    ThirdPerson = true;
+                    Config.mainMenuThirdPerson = true;
+					ThirdPerson = true;
                     CreateScreenRenderTexture();
                 }
             }

@@ -14,11 +14,24 @@ namespace CameraPlus
         public float rotationSmooth = 5;
         public float cam360Smoothness = 2;
 
-        public bool thirdPerson = false;
         public bool showThirdPersonCamera = true;
-        public bool use360Camera = false;
+		public string mainMenuCameraType = "FirstPerson";
+		public bool mainMenuUse360Camera = false;
+		public bool mainMenuThirdPerson = false;
+		
+		public string gameCoreNormalCameraType = "FirstPerson";
+		public bool gameCoreNormalUse360Camera = false;
+		public bool gameCoreNormalThirdPerson = false;
 
-        public float posx;
+		public string gameCore360CameraType = "FirstPerson";
+		public bool gameCore360Use360Camera = false;
+		public bool gameCore360ThirdPerson = false;
+
+		public bool showAvatar = true;
+
+		public bool alternativeGameModeDetection = true;
+
+		public float posx;
         public float posy = 2;
         public float posz = -1.2f;
 

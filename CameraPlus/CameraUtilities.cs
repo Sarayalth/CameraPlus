@@ -16,7 +16,7 @@ namespace CameraPlus
             return Plugin.Instance.Cameras.Keys.Where(c => c == cameraName + ".cfg").Count() > 0;
         }
         
-        public static void AddNewCamera(string cameraName, Config CopyConfig = null, bool meme = false)
+        public static void AddNewCamera(string cameraName, Config CopyConfig = null)
         {
             string path = Path.Combine(BeatSaber.UserDataPath, Plugin.Name, $"{cameraName}.cfg");
             if (!File.Exists(path))
@@ -51,22 +51,7 @@ namespace CameraPlus
                 if (cameraName == Plugin.MainCamera)
                     config.fitToCanvas = true;
 
-                if (meme)
-                {
-                    config.screenWidth = (int)Random.Range(200, Screen.width / 1.5f);
-                    config.screenHeight = (int)Random.Range(200, Screen.height / 1.5f);
-                    config.screenPosX = Random.Range(-200, Screen.width - config.screenWidth + 200);
-                    config.screenPosY = Random.Range(-200, Screen.height - config.screenHeight + 200);
-                    config.thirdPerson = Random.Range(0, 2) == 0;
-                    config.renderScale = Random.Range(0.1f, 1.0f);
-                    config.posx += Random.Range(-5, 5);
-                    config.posy += Random.Range(-2, 2);
-                    config.posz += Random.Range(-5, 5);
-                    config.angx = Random.Range(0, 360);
-                    config.angy = Random.Range(0, 360);
-                    config.angz = Random.Range(0, 360);
-                }
-                else if (CopyConfig == null && cameraName != Plugin.MainCamera)
+                if (CopyConfig == null && cameraName != Plugin.MainCamera)
                 {
                     config.screenHeight /= 4;
                     config.screenWidth /= 4;
@@ -158,20 +143,6 @@ namespace CameraPlus
             {
                 Logger.Log($"Exception while reloading cameras! Exception:" +
                     $" {ex.Message}\n{ex.StackTrace}", LogLevel.Error);
-            }
-        }
-
-        public static IEnumerator Spawn38Cameras()
-        {
-            lock (Plugin.Instance.Cameras)
-            {
-                for (int i = 0; i < 38; i++)
-                {
-                    AddNewCamera(GetNextCameraName(), null, true);
-                    ReloadCameras();
-
-                    yield return null;
-                }
             }
         }
     }

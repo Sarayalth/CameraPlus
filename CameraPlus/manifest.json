@@ -5,6 +5,9 @@
   "gameVersion": "1.6.0",
   "id": "CameraPlus",
   "name": "CameraPlus",
-  "version": "3.6.1",
-  "features": []
+  "version": "3.6.2",
+  "features": [],
+  "dependsOn": {
+    "BS_Utils": "^1.4.1"
+  }
 }
